@@ -2,7 +2,7 @@ name: Auto YouTube Pipeline
 
 on:
   schedule:
-    # 4 times per day — every 6 hours starting at 6am UTC
+    # 4 times per day — every 6 hours
     - cron: '0 6 * * *'
     - cron: '0 12 * * *'
     - cron: '0 18 * * *'
@@ -21,10 +21,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install FFmpeg and yt-dlp
-        run: |
-          sudo apt-get install -y ffmpeg
-          pip install yt-dlp
+      - name: Install FFmpeg
+        run: sudo apt-get install -y ffmpeg
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -32,8 +30,9 @@ jobs:
       - name: Download gameplay videos
         run: |
           mkdir -p assets
-          yt-dlp "https://youtu.be/z84bmLDzIIk" -o "assets/minecraft.mp4" --format "bestvideo[height=1080][ext=mp4]+bestaudio" --merge-output-format mp4 --no-playlist
-          yt-dlp "https://youtu.be/918nue6anzM" -o "assets/satisfying.mp4" --format "bestvideo[height<=1440]+bestaudio" --merge-output-format mp4 --no-playlist
+          pip install gdown
+          gdown "1Pq-CbjAOVP6pgVbi7VHJIT09UrqQ4kFo" -O assets/minecraft.mp4
+          gdown "1IQJadQV-X6M1wYijkhqzPi7CXLfHGD1x" -O assets/satisfying.mp4
 
       - name: Restore YouTube token
         run: |
