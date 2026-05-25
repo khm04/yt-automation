@@ -20,21 +20,20 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install FFmpeg
-        run: sudo apt-get install -y ffmpeg
+      - name: Install FFmpeg and yt-dlp
+        run: |
+          sudo apt-get install -y ffmpeg
+          pip install yt-dlp
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Create assets directory
-        run: mkdir -p assets
-
       - name: Download gameplay videos
         run: |
-          pip install gdown
-          gdown "${{ secrets.MINECRAFT_VIDEO_URL }}" -O assets/minecraft.mp4
-          gdown "${{ secrets.SUBWAY_VIDEO_URL }}" -O assets/subway.mp4
-          gdown "${{ secrets.SATISFYING_VIDEO_URL }}" -O assets/satisfying.mp4
+          mkdir -p assets
+          yt-dlp "https://youtu.be/z84bmLDzIIk" -o "assets/minecraft.mp4" --format "bestvideo[height=1080][ext=mp4]+bestaudio" --merge-output-format mp4 --no-playlist
+          yt-dlp "https://youtu.be/zZ7AimPACzc" -o "assets/subway.mp4" --format "bestvideo[height<=1080]+bestaudio" --merge-output-format mp4 --no-playlist
+          yt-dlp "https://youtu.be/918nue6anzM" -o "assets/satisfying.mp4" --format "bestvideo[height<=1440]+bestaudio" --merge-output-format mp4 --no-playlist
 
       - name: Restore YouTube token
         run: |
