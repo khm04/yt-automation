@@ -29,7 +29,6 @@ OUTPUT_DIR = "output"
 # (path, intro_skip_seconds)
 GAMEPLAY_VIDEOS = [
     (f"{ASSETS_DIR}/minecraft.mp4", 0),
-    (f"{ASSETS_DIR}/subway.mp4", 0),
     (f"{ASSETS_DIR}/satisfying.mp4", 5),
 ]
 
