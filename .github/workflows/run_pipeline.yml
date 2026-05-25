@@ -16,6 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -31,7 +37,7 @@ jobs:
         run: |
           mkdir -p assets
           pip install gdown
-          gdown "1Pq-CbjAOVP6pgVbi7VHJIT09UrqQ4kFo" -O assets/minecraft.mp4
+          gdown "1fybRwVPmZ8adok0EBrPMwn9qo4pJ71GC" -O assets/minecraft.mp4
           gdown "1IQJadQV-X6M1wYijkhqzPi7CXLfHGD1x" -O assets/satisfying.mp4
 
       - name: Restore YouTube token
