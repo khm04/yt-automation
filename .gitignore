@@ -1,0 +1,10 @@
+.env
+token.pickle
+client_secrets.json
+assets/
+output/
+__pycache__/
+*.pyc
+*.mp3
+*.srt
+.pytest_cache/

@@ -1,0 +1,49 @@
+name: Auto YouTube Pipeline
+
+on:
+  schedule:
+    # 3 times per day — every 8 hours starting at 7am UTC
+    - cron: '0 7 * * *'
+    - cron: '0 15 * * *'
+    - cron: '0 23 * * *'
+  workflow_dispatch: # allows manual trigger from GitHub UI
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install FFmpeg
+        run: sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create assets directory
+        run: mkdir -p assets
+
+      - name: Download gameplay videos
+        run: |
+          pip install gdown
+          gdown "${{ secrets.MINECRAFT_VIDEO_URL }}" -O assets/minecraft.mp4
+          gdown "${{ secrets.SUBWAY_VIDEO_URL }}" -O assets/subway.mp4
+          gdown "${{ secrets.SATISFYING_VIDEO_URL }}" -O assets/satisfying.mp4
+
+      - name: Restore YouTube token
+        run: |
+          echo "${{ secrets.YOUTUBE_TOKEN_PICKLE }}" | base64 -d > token.pickle
+
+      - name: Run pipeline (1 video per trigger)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          VIDEOS_PER_DAY_OVERRIDE: '1'
+        run: python main.py
