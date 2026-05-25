@@ -11,7 +11,7 @@ from modules.uploader import upload_to_youtube
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-def run_single_video():
+def run_single_video(video_index: int = 0):
     """Run the full pipeline for one video. Returns YouTube video ID."""
     video_id = str(uuid.uuid4())[:8]
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -25,19 +25,38 @@ def run_single_video():
     story = fetch_story()
     print(f"   Got: {story['title'][:60]}...")
 
-    # Step 2: Rewrite as script
+    # Step 2: Rewrite as script (retry until audio hits 60s)
     print("Rewriting with Gemini...")
     script = rewrite_as_script(story["title"], story["body"])
     meta = generate_title_and_tags(script)
     print(f"   Title: {meta['title']}")
 
     # Step 3: Generate voice
-    print("Generating voice with ElevenLabs...")
+    print("Generating voice...")
     audio_path = generate_voice(script, f"{base_name}.mp3")
 
-    # Step 4: Assemble video
+    # Step 4: Assemble video (raises ValueError if audio < 60s)
     print("Assembling video with FFmpeg...")
-    video_path = assemble_video(audio_path, script, f"{base_name}.mp4")
+    attempt = 0
+    video_path = None
+    while attempt < 3:
+        try:
+            video_path = assemble_video(
+                audio_path, script, f"{base_name}.mp4",
+                subreddit=story["subreddit"],
+                story_title=story["title"],
+                video_index=video_index,
+            )
+            break
+        except ValueError as e:
+            attempt += 1
+            print(f"   {e} — expanding script (attempt {attempt})...")
+            from modules.script_writer import expand_script
+            script = expand_script(script)
+            audio_path = generate_voice(script, f"{base_name}.mp3")
+
+    if video_path is None:
+        raise RuntimeError("Could not generate a 60s+ video after 3 attempts")
 
     # Step 5: Upload to YouTube (skip in dry-run mode)
     if os.getenv("DRY_RUN"):
@@ -58,7 +77,6 @@ def run_single_video():
     )
     print(f"   Uploaded: https://youtube.com/watch?v={yt_id}")
 
-    # Cleanup temp files
     os.remove(audio_path)
     os.remove(video_path)
     srt_path = video_path.replace(".mp4", ".srt")
@@ -75,7 +93,7 @@ def main():
     for i in range(VIDEOS_PER_DAY):
         print(f"\nVideo {i + 1} of {VIDEOS_PER_DAY}")
         try:
-            yt_id = run_single_video()
+            yt_id = run_single_video(video_index=i)
             results.append({"status": "success", "id": yt_id})
         except Exception as e:
             print(f"   Failed: {e}")

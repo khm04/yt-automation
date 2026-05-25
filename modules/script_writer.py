@@ -51,6 +51,19 @@ Rewrite it now at exactly 185 words:"""
     return script
 
 
+def expand_script(script: str) -> str:
+    """Expand a short script to hit 60s audio length."""
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    prompt = f"""This narration script is too short. Expand it to exactly 200 words by adding more emotional reactions, tension, and detail. Keep the same story, same style, no hashtags, no stage directions.
+
+Script:
+{script}
+
+Rewrite at exactly 200 words:"""
+    response = model.generate_content(prompt)
+    return response.text.strip()
+
+
 def generate_title_and_tags(script: str) -> dict:
     """Generate a YouTube title and tags from the script."""
     model = genai.GenerativeModel("gemini-2.5-flash")

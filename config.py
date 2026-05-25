@@ -26,8 +26,10 @@ MIN_VIDEO_DURATION = 45  # seconds
 # Paths
 ASSETS_DIR = "assets"
 OUTPUT_DIR = "output"
-# (path, intro_skip_seconds)
+# Ordered rotation: minecraft, rocket league, minecraft, rocket league
 GAMEPLAY_VIDEOS = [
+    (f"{ASSETS_DIR}/minecraft.mp4", 0),
+    (f"{ASSETS_DIR}/satisfying.mp4", 5),
     (f"{ASSETS_DIR}/minecraft.mp4", 0),
     (f"{ASSETS_DIR}/satisfying.mp4", 5),
 ]
@@ -35,7 +37,7 @@ GAMEPLAY_VIDEOS = [
 # Reddit sources
 SUBREDDITS = ["AmItheAsshole", "tifu", "relationship_advice", "confessions", "TrueOffMyChest"]
 POSTS_LIMIT = 20  # fetch top 20, pick best one
-VIDEOS_PER_DAY = 6
+VIDEOS_PER_DAY = 4
 
 # Allow GitHub Actions to override videos per run
 VIDEOS_PER_DAY = int(os.getenv("VIDEOS_PER_DAY_OVERRIDE", VIDEOS_PER_DAY))

@@ -2,11 +2,12 @@ name: Auto YouTube Pipeline
 
 on:
   schedule:
-    # 3 times per day — every 8 hours starting at 7am UTC
-    - cron: '0 7 * * *'
-    - cron: '0 15 * * *'
-    - cron: '0 23 * * *'
-  workflow_dispatch: # allows manual trigger from GitHub UI
+    # 4 times per day — every 6 hours starting at 6am UTC
+    - cron: '0 6 * * *'
+    - cron: '0 12 * * *'
+    - cron: '0 18 * * *'
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   run-pipeline:
@@ -32,7 +33,6 @@ jobs:
         run: |
           mkdir -p assets
           yt-dlp "https://youtu.be/z84bmLDzIIk" -o "assets/minecraft.mp4" --format "bestvideo[height=1080][ext=mp4]+bestaudio" --merge-output-format mp4 --no-playlist
-          yt-dlp "https://youtu.be/zZ7AimPACzc" -o "assets/subway.mp4" --format "bestvideo[height<=1080]+bestaudio" --merge-output-format mp4 --no-playlist
           yt-dlp "https://youtu.be/918nue6anzM" -o "assets/satisfying.mp4" --format "bestvideo[height<=1440]+bestaudio" --merge-output-format mp4 --no-playlist
 
       - name: Restore YouTube token
