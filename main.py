@@ -90,10 +90,14 @@ def main():
     print(f"Starting automated pipeline — {VIDEOS_PER_DAY} videos")
     results = []
 
+    # Use current hour to determine video index so each trigger uses correct background
+    from datetime import datetime as _dt
+    base_index = int(os.getenv("VIDEO_INDEX_OVERRIDE", str(_dt.utcnow().hour // 6 % len(__import__('config').GAMEPLAY_VIDEOS))))
+
     for i in range(VIDEOS_PER_DAY):
         print(f"\nVideo {i + 1} of {VIDEOS_PER_DAY}")
         try:
-            yt_id = run_single_video(video_index=i)
+            yt_id = run_single_video(video_index=base_index + i)
             results.append({"status": "success", "id": yt_id})
         except Exception as e:
             print(f"   Failed: {e}")
