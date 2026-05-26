@@ -28,9 +28,9 @@ ASSETS_DIR = "assets"
 OUTPUT_DIR = "output"
 # Ordered rotation: minecraft, rocket league, minecraft, rocket league
 GAMEPLAY_VIDEOS = [
-    (f"{ASSETS_DIR}/minecraft.mp4", 0),
+    (f"{ASSETS_DIR}/minecraft_1080p.mp4", 0),
     (f"{ASSETS_DIR}/satisfying.mp4", 5),
-    (f"{ASSETS_DIR}/minecraft.mp4", 0),
+    (f"{ASSETS_DIR}/minecraft_1080p.mp4", 0),
     (f"{ASSETS_DIR}/satisfying.mp4", 5),
 ]
 
