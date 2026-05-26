@@ -1,8 +1,9 @@
 name: Auto YouTube Pipeline
 
 on:
+  push:
+    branches: [main]
   schedule:
-    # 4 times per day — every 6 hours
     - cron: '0 6 * * *'
     - cron: '0 12 * * *'
     - cron: '0 18 * * *'
