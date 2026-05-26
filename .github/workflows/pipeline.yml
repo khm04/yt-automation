@@ -1,0 +1,52 @@
+name: Auto YouTube Pipeline
+
+on:
+  schedule:
+    # 4 times per day — every 6 hours
+    - cron: '0 6 * * *'
+    - cron: '0 12 * * *'
+    - cron: '0 18 * * *'
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install FFmpeg
+        run: sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download gameplay videos
+        run: |
+          mkdir -p assets
+          curl -L "https://github.com/khm04/yt-automation/releases/download/v1/minecraft_1080p.mp4" -o assets/minecraft.mp4
+          curl -L "https://github.com/khm04/yt-automation/releases/download/v1/satisfying.mp4" -o assets/satisfying.mp4
+
+      - name: Restore YouTube token
+        run: |
+          echo "${{ secrets.YOUTUBE_TOKEN_PICKLE }}" | base64 -d > token.pickle
+
+      - name: Run pipeline (1 video per trigger)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          VIDEOS_PER_DAY_OVERRIDE: '1'
+        run: python main.py
