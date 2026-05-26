@@ -36,9 +36,8 @@ jobs:
       - name: Download gameplay videos
         run: |
           mkdir -p assets
-          pip install gdown
-          gdown "1fybRwVPmZ8adok0EBrPMwn9qo4pJ71GC" -O assets/minecraft.mp4
-          gdown "1IQJadQV-X6M1wYijkhqzPi7CXLfHGD1x" -O assets/satisfying.mp4
+          curl -L "https://github.com/khm04/yt-automation/releases/download/v1/minecraft_1080p.mp4" -o assets/minecraft.mp4
+          curl -L "https://github.com/khm04/yt-automation/releases/download/v1/satisfying.mp4" -o assets/satisfying.mp4
 
       - name: Restore YouTube token
         run: |
