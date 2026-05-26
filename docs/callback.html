@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok OAuth Callback</title>
+  <style>
+    body { font-family: system-ui, sans-serif; display: flex; align-items: center;
+           justify-content: center; min-height: 100vh; margin: 0; background: #f9f9f9; }
+    .card { background: #fff; padding: 2rem 2.5rem; border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,.1); text-align: center; max-width: 400px; }
+    h1 { margin: 0 0 .5rem; font-size: 1.4rem; color: #111; }
+    p  { color: #555; margin: 0; font-size: .95rem; }
+    .code { font-family: monospace; background: #f0f0f0; padding: .25rem .5rem;
+            border-radius: 4px; font-size: .85rem; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>&#x2705; Authorization Complete</h1>
+    <p>Your TikTok account has been linked to <strong>RedditStoriesDaily</strong>.</p>
+    <br>
+    <p id="msg">Extracting authorization code&hellip;</p>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code  = params.get('code');
+    const state = params.get('state');
+    const err   = params.get('error');
+    const msg   = document.getElementById('msg');
+
+    if (err) {
+      msg.textContent = 'Error: ' + err + ' — ' + (params.get('error_description') || '');
+    } else if (code) {
+      msg.innerHTML = 'Authorization code: <span class="code">' + code + '</span>';
+    } else {
+      msg.textContent = 'No code found in URL.';
+    }
+  </script>
+</body>
+</html>
