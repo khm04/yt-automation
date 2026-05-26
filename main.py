@@ -7,6 +7,7 @@ from modules.script_writer import rewrite_as_script, generate_title_and_tags, ge
 from modules.voice_generator import generate_voice
 from modules.video_assembler import assemble_video
 from modules.uploader import upload_to_youtube
+from modules.tiktok_uploader import upload_to_tiktok
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -60,7 +61,7 @@ def run_single_video(video_index: int = 0):
     if video_path is None:
         raise RuntimeError("Could not generate a 60s+ video after 3 attempts")
 
-    # Step 5: Upload to YouTube (skip in dry-run mode)
+    # Step 5+6: Upload to YouTube + TikTok (skip in dry-run mode)
     if os.getenv("DRY_RUN"):
         print(f"   DRY RUN — video saved at: {video_path}")
         return video_path
@@ -79,13 +80,31 @@ def run_single_video(video_index: int = 0):
     )
     print(f"   Uploaded: https://youtube.com/watch?v={yt_id}")
 
+    # Step 6: Upload to TikTok (skipped if credentials not set)
+    tiktok_url = None
+    try:
+        print("Uploading to TikTok...")
+        tiktok_tags = meta["tags"] + ["reddit", "redditstories", "storytime", "tiktok", "viral"]
+        tiktok_url = upload_to_tiktok(
+            video_path=video_path,
+            title=meta["title"],
+            tags=tiktok_tags,
+        )
+        print(f"   TikTok: {tiktok_url}")
+    except EnvironmentError as e:
+        # Credentials not configured yet — skip gracefully
+        print(f"   TikTok skipped: {e}")
+    except Exception as e:
+        # Don't let TikTok failure abort the whole pipeline
+        print(f"   TikTok upload failed (non-fatal): {e}")
+
     os.remove(audio_path)
     os.remove(video_path)
     srt_path = video_path.replace(".mp4", ".srt")
     if os.path.exists(srt_path):
         os.remove(srt_path)
 
-    return yt_id
+    return {"youtube": yt_id, "tiktok": tiktok_url}
 
 
 def main():
@@ -99,8 +118,8 @@ def main():
     for i in range(VIDEOS_PER_DAY):
         print(f"\nVideo {i + 1} of {VIDEOS_PER_DAY}")
         try:
-            yt_id = run_single_video(video_index=base_index + i)
-            results.append({"status": "success", "id": yt_id})
+            ids = run_single_video(video_index=base_index + i)
+            results.append({"status": "success", **ids} if isinstance(ids, dict) else {"status": "success", "id": ids})
         except Exception as e:
             print(f"   Failed: {e}")
             results.append({"status": "failed", "error": str(e)})
