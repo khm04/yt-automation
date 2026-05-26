@@ -9,7 +9,7 @@ engaging narration script for a faceless YouTube channel.
 
 Rules:
 - Start with a HOOK that grabs attention in the first 3 seconds (e.g. "You will NOT believe what happened...")
-- Write EXACTLY 160-175 words — no more, no less (this is critical for video length)
+- Write EXACTLY 180-200 words — no more, no less (this is critical for video length)
 - Use short punchy sentences with NO filler words
 - NO long pauses — keep the energy up the entire time
 - Build tension and emotion fast
@@ -21,7 +21,7 @@ Story title: {title}
 
 Story: {body}
 
-Write the script now (160-175 words exactly):
+Write the script now (180-200 words exactly):
 """
 
 
@@ -62,6 +62,20 @@ Script:
 Rewrite at exactly 200 words:"""
     response = model.generate_content(prompt)
     return response.text.strip()
+
+
+def generate_reddit_title(script: str) -> str:
+    """Generate a Reddit-style post title that matches the actual script content."""
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    prompt = f"""Read this narration script and write a Reddit post title for it.
+Make it sound like a real Reddit post — shocking, emotional, or controversial.
+Under 12 words. No quotes. No labels. Just the title.
+
+Script (first 300 chars):
+{script[:300]}
+
+Write the Reddit title now:"""
+    return model.generate_content(prompt).text.strip()
 
 
 def generate_title_and_tags(script: str) -> dict:

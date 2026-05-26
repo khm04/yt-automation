@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from config import OUTPUT_DIR, VIDEOS_PER_DAY
 from modules.reddit_fetcher import fetch_story
-from modules.script_writer import rewrite_as_script, generate_title_and_tags
+from modules.script_writer import rewrite_as_script, generate_title_and_tags, generate_reddit_title
 from modules.voice_generator import generate_voice
 from modules.video_assembler import assemble_video
 from modules.uploader import upload_to_youtube
@@ -29,7 +29,9 @@ def run_single_video(video_index: int = 0):
     print("Rewriting with Gemini...")
     script = rewrite_as_script(story["title"], story["body"])
     meta = generate_title_and_tags(script)
+    card_title = generate_reddit_title(script)
     print(f"   Title: {meta['title']}")
+    print(f"   Card:  {card_title}")
 
     # Step 3: Generate voice
     print("Generating voice...")
@@ -44,7 +46,7 @@ def run_single_video(video_index: int = 0):
             video_path = assemble_video(
                 audio_path, script, f"{base_name}.mp4",
                 subreddit=story["subreddit"],
-                story_title=story["title"],
+                story_title=card_title,
                 video_index=video_index,
             )
             break

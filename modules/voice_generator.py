@@ -39,9 +39,13 @@ def generate_voice(text: str, output_path: str) -> str:
     wav_path = output_path.replace(".mp3", ".wav")
     _save_wav(audio_data, wav_path, sample_rate=24000, channels=1, sampwidth=2)
 
-    # Convert to mp3 via ffmpeg for compatibility with the rest of the pipeline
+    # Convert to mp3 + speed up 1.2x to match the energetic pace of the channel
     mp3_path = output_path if output_path.endswith(".mp3") else output_path.replace(".wav", ".mp3")
-    os.system(f'ffmpeg -y -i "{wav_path}" -q:a 2 "{mp3_path}" -loglevel quiet')
+    os.system(
+        f'ffmpeg -y -i "{wav_path}" '
+        f'-filter:a "atempo=1.15" '
+        f'-q:a 2 "{mp3_path}" -loglevel quiet'
+    )
     if os.path.exists(wav_path) and wav_path != mp3_path:
         os.remove(wav_path)
 

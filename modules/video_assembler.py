@@ -9,8 +9,8 @@ from config import (
     VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS
 )
 
-MIN_DURATION = 60.0
-MAX_DURATION = 65.0
+MIN_DURATION = 55.0  # 55s after 1.15x speedup = ~63s of natural speech
+MAX_DURATION = 90.0  # allow up to 90s so story never gets cut off mid-sentence
 CARD_DISPLAY_SECS = 4  # how long the Reddit card stays on screen
 
 _whisper_model = None
